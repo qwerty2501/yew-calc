@@ -1,0 +1,7 @@
+@import '~purecss';
+
+.calc {
+  &__button {
+    @extend .pure-button;
+  }
+}
