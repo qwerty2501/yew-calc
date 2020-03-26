@@ -42,8 +42,7 @@ impl Component for App {
                         { self.render_button('C',4)}
                         { self.render_button('÷',4)}
                         { self.render_button('×',4)}
-                        <div class="pure-u-1-4">
-                            <button class="calc__button calc__button--normal" type="button">{'　'}</button>
+                        <div class="calc__button pure-u-1-4">
                         </div>
                     </div>
                     <div class="pure-g">
