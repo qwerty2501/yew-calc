@@ -6,7 +6,8 @@ pub struct App {
 }
 
 pub enum Msg {
-    PushButton(&'static str),
+    PushValue(char),
+    ModifiedDisplay(String),
 }
 
 impl Component for App {
@@ -19,21 +20,63 @@ impl Component for App {
         }
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
+    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        match msg {
+            Msg::PushValue(v) => {
+                self.display.push(v);
+                true
+            }
+            Msg::ModifiedDisplay(v) => {
+                self.display = v;
+                true
+            }
+        }
     }
 
     fn view(&self) -> Html {
         html! {
-            <div >
-                <input type="text" value={self.display.clone()} />
-                <div class="pure-g">
-                    <div class="pure-u-1-3">
-                        <button class=".calc__button" type="button" name="1" value="1" onclick=self.link.callback(|_|Msg::PushButton(""))>{1}</button>
+            <div class="calc">
+                <input type="text" class="calc__display--normal" value={self.display.clone()} oninput=self.link.callback(|e:InputData|Msg::ModifiedDisplay(e.value))/>
+                <div class="calc__buttons--normal">
+                    <div class="pure-g">
+                        { self.render_button('C',4)}
+                        { self.render_button('÷',4)}
+                        { self.render_button('×',4)}
+                        <div class="pure-u-1-4">
+                            <button class="calc__button calc__button--normal" type="button">{'　'}</button>
+                        </div>
                     </div>
-                    <div class="pure-u-1-3"></div>
-                    <div class="pure-u-1-3"></div>
+                    <div class="pure-g">
+                        { self.render_buttons(&['7','8','9','↰'])}
+                    </div>
+                    <div class="pure-g">
+                        { self.render_buttons(&['4','5','6','-'])}
+                    </div>
+                    <div class="pure-g">
+                        { self.render_buttons(&['1','2','3','+'])}
+                    </div>
+                    <div class="pure-g">
+                        { self.render_buttons(&['0','.','%','='])}
+                    </div>
                 </div>
+            </div>
+        }
+    }
+}
+
+impl App {
+    fn render_buttons(&self, values: &[char]) -> Html {
+        html! {
+            { for values.iter().map(|&v|{
+                self.render_button(v,values.len())
+            })}
+        }
+    }
+
+    fn render_button(&self, v: char, len: usize) -> Html {
+        html! {
+            <div class={format!("{}{}","pure-u-1-", len)}>
+                <button class="calc__button calc__button--normal" type="button"  onclick=self.link.callback(move |_|Msg::PushValue(v))>{v}</button>
             </div>
         }
     }
