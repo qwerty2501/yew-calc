@@ -21,6 +21,8 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "autoprefixer": "^9.7.5",
+    "postcss-modules": "^1.5.0",
     "purecss": "^1.0.1",
     "ress": "^2.0.4"
   }
