@@ -35,26 +35,26 @@ impl Component for App {
 
     fn view(&self) -> Html {
         html! {
-            <div class="calc">
+            <div class="calc calc--device">
                 <input type="text" class="calc__display--normal" value={self.display.clone()} oninput=self.link.callback(|e:InputData|Msg::ModifiedDisplay(e.value))/>
-                <div class="calc__buttons--normal">
-                    <div class="pure-g">
+                <div class="calc__buttons--normal calc__buttons--device">
+                    <div class="pure-g calc__buttons-group--normal">
                         { self.render_button('C',4)}
                         { self.render_button('÷',4)}
                         { self.render_button('×',4)}
                         <div class="calc__button pure-u-1-4">
                         </div>
                     </div>
-                    <div class="pure-g">
+                    <div class="pure-g calc__buttons-group--normal">
                         { self.render_buttons(&['7','8','9','↰'])}
                     </div>
-                    <div class="pure-g">
+                    <div class="pure-g calc__buttons-group--normal">
                         { self.render_buttons(&['4','5','6','-'])}
                     </div>
-                    <div class="pure-g">
+                    <div class="pure-g calc__buttons-group--normal">
                         { self.render_buttons(&['1','2','3','+'])}
                     </div>
-                    <div class="pure-g">
+                    <div class="pure-g calc__buttons-group--normal">
                         { self.render_buttons(&['0','.','%','='])}
                     </div>
                 </div>
@@ -74,7 +74,7 @@ impl App {
 
     fn render_button(&self, v: char, len: usize) -> Html {
         html! {
-            <div class={format!("{}{}","pure-u-1-", len)}>
+            <div class={format!("{}{} {}","pure-u-1-", len,"calc__buttons-unit--normal")}>
                 <button class="calc__button calc__button--normal" type="button"  onclick=self.link.callback(move |_|Msg::PushValue(v))>{v}</button>
             </div>
         }
