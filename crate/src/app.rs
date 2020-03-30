@@ -36,7 +36,9 @@ impl Component for App {
     fn view(&self) -> Html {
         html! {
             <div class="calc calc--device">
-                <input type="text" class="calc__display--normal" value={self.display.clone()} oninput=self.link.callback(|e:InputData|Msg::ModifiedDisplay(e.value))/>
+                <div class="calc__display--normal">
+                    <input type="text" class="calc__display-input--normal" value={self.display.clone()} oninput=self.link.callback(|e:InputData|Msg::ModifiedDisplay(e.value))/>
+                </div>
                 <div class="calc__buttons--normal calc__buttons--device">
                     <div class="pure-g calc__buttons-group--normal">
                         { self.render_button('C',4)}

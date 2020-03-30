@@ -34,12 +34,18 @@ body {
     }
   }
   &__display {
+    &-input {
+      &--normal {
+        height: 100%;
+        width: 100%;
+        font-size: 2em;
+        padding: 0px;
+        border-width: 0px;
+      }
+    }
     &--normal {
       width: 100%;
-      font-size: 2em;
       height: 10%;
-      padding: 0px;
-      border-width: 0px;
     }
   }
 }
