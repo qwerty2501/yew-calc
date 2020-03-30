@@ -17,14 +17,18 @@ body {
       font-size: 2em;
     }
   }
-  &__buttons-group {
-    &--normal {
-      height: 20%;
+  &__buttons {
+    &-group {
+      &--normal {
+        height: 20%;
+      }
     }
-  }
-  &__buttons-unit {
-    &--normal {
-      height: 100%;
+    &-unit {
+      box-sizing: border-box;
+      padding: 0.1em;
+      &--normal {
+        height: 100%;
+      }
     }
   }
   &__buttons {

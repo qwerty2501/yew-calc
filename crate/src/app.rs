@@ -93,7 +93,7 @@ impl Component for App {
                         { self.render_button(&ButtonValue::Clear,4)}
                         { self.render_button(&ButtonValue::Division,4)}
                         { self.render_button(&ButtonValue::Multiplication,4)}
-                        <div class="calc__button pure-u-1-4">
+                        <div class="calc__button pure-u-1-4 calc__buttons-unit calc__buttons-unit--normal">
                         </div>
                     </div>
                     <div class="pure-g calc__buttons-group--normal">
@@ -126,7 +126,7 @@ impl App {
     fn render_button(&self, v: &ButtonValue, len: usize) -> Html {
         let onclick_value = v.clone();
         html! {
-            <div class={format!("{}{} {}","pure-u-1-", len,"calc__buttons-unit--normal")}>
+            <div class={format!("{}{} calc__buttons-unit calc__buttons-unit--normal","pure-u-1-", len)}>
                 <button class="calc__button calc__button--normal" type="button"  onclick=self.link.callback(move |_|Msg::PushButton(onclick_value.clone()))>{v}</button>
             </div>
         }
