@@ -54,8 +54,25 @@ impl Component for App {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::PushButton(v) => {
-                self.display.push_str(&v.to_string());
+            Msg::PushButton(b) => {
+                match b {
+                    ButtonValue::Number(_)
+                    | ButtonValue::Plus
+                    | ButtonValue::Minus
+                    | ButtonValue::Division
+                    | ButtonValue::Multiplication
+                    | ButtonValue::Dot
+                    | ButtonValue::Percent => self.display.push_str(&b.to_string()),
+                    ButtonValue::Redo => {
+                        self.display.pop();
+                    }
+                    ButtonValue::Clear => {
+                        self.display = String::new();
+                    }
+                    ButtonValue::Equal => {
+                        self.display = String::new();
+                    }
+                }
                 true
             }
             Msg::ModifiedDisplay(v) => {
