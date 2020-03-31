@@ -1,3 +1,4 @@
+use crate::calc::*;
 use std::fmt;
 use yew::prelude::*;
 
@@ -70,7 +71,11 @@ impl Component for App {
                         self.display = String::new();
                     }
                     ButtonValue::Equal => {
-                        self.display = String::new();
+                        let result = calculate(&self.display);
+                        match result {
+                            Ok(new_display) => self.display = new_display,
+                            _ => panic!("not implemented"),
+                        }
                     }
                 }
                 true
