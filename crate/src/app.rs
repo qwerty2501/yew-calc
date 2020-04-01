@@ -1,4 +1,4 @@
-use crate::calc::*;
+use crate::calculator::*;
 use std::fmt;
 use yew::prelude::*;
 

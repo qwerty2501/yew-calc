@@ -17,6 +17,8 @@ console_error_panic_hook = { version = "0.1.6",optional = true }
 cfg-if = "0.1.10"
 test-case = "1.0.0"
 bigdecimal = "0.1.0"
+anyhow = "1.0.27"
+thiserror = "1.0.13"
 
 
 [build]

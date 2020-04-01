@@ -1,7 +1,9 @@
 #![recursion_limit = "512"]
 mod app;
-mod calc;
-mod err;
+mod calculator;
+mod error;
+mod parser;
+mod result;
 #[macro_use]
 extern crate cfg_if;
 
