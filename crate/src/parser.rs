@@ -122,8 +122,8 @@ mod tests {
     }
 
     #[test_case(Operator::Plus,BigDecimal::from(100),BigDecimal::from(300) => BigDecimal::from(400))]
-    #[test_case(Operator::Minus,BigDecimal::from(300),BigDecimal::from(500) => BigDecimal::from(200))]
-    #[test_case(Operator::Multiplication,BigDecimal::from(300),BigDecimal::from(500) => BigDecimal::from(1500))]
+    #[test_case(Operator::Minus,BigDecimal::from(300),BigDecimal::from(500) => BigDecimal::from(-200))]
+    #[test_case(Operator::Multiplication,BigDecimal::from(300),BigDecimal::from(500) => BigDecimal::from(150000))]
     #[test_case(Operator::Division,BigDecimal::from(500),BigDecimal::from(100) => BigDecimal::from(5))]
     fn operate_works(op: Operator, v1: BigDecimal, v2: BigDecimal) -> BigDecimal {
         op.operate(&v1, &v2)
