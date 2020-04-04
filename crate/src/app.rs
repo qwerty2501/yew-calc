@@ -96,7 +96,12 @@ impl Component for App {
         html! {
             <div class="calc calc--device">
                 <div class="calc__display--normal">
-                    <input type="text" maxlength="20" class="calc__display-input calc__display-input--normal" value={self.display.clone()} oninput=self.link.callback(|e:InputData|Msg::ModifiedDisplay(e.value))/>
+                    <form  onsubmit=self.link.callback(|e:Event|{
+                        e.prevent_default();
+                        Msg::PushButton(ButtonValue::Equal)
+                    })>
+                        <input type="text" maxlength="20" class="calc__display-input calc__display-input--normal" value={self.display.clone()} oninput=self.link.callback(|e:InputData|Msg::ModifiedDisplay(e.value))/>
+                    </form>
                 </div>
                 <div class="calc__buttons--normal calc__buttons--device">
                     <div class="pure-g calc__buttons-group--normal">
