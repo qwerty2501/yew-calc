@@ -26,7 +26,10 @@ fn calculate_tokens(tokens: Vec<Token>) -> Result<BigDecimal> {
 
 fn operate_tokens(tokens: Vec<Token>, op: Operator) -> Result<Vec<Token>> {
     let mut result_tokens = Vec::with_capacity(tokens.len());
-    for (index, token) in tokens.iter().enumerate() {
+    let mut index = 0;
+    while index < tokens.len() {
+        let token = tokens.get(index).ok_or(AppError::InvalidExpression)?;
+        index += 1;
         match token {
             Token::Decimal(_) => result_tokens.push(token.clone()),
             Token::Operator(iop) => {
@@ -36,7 +39,9 @@ fn operate_tokens(tokens: Vec<Token>, op: Operator) -> Result<Vec<Token>> {
                     } else {
                         Err(AppError::InvalidExpression)
                     }?;
-                    let v2 = if let Some(Token::Decimal(decimal)) = tokens.get(index + 1) {
+
+                    let v2 = if let Some(Token::Decimal(decimal)) = tokens.get(index) {
+                        index += 1;
                         Ok(decimal)
                     } else {
                         Err(AppError::InvalidExpression)
@@ -49,4 +54,90 @@ fn operate_tokens(tokens: Vec<Token>, op: Operator) -> Result<Vec<Token>> {
         }
     }
     Ok(result_tokens)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test_case::test_case;
+
+    #[test_case(vec![Token::Decimal(BigDecimal::from(100))],Operator::Multiplication => Ok(vec![Token::Decimal(BigDecimal::from(100))]))]
+    #[test_case(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Plus),
+        Token::Decimal(BigDecimal::from(100)),
+    ],
+    Operator::Multiplication => Ok(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Plus),
+        Token::Decimal(BigDecimal::from(100)),
+    ]))]
+    #[test_case(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Multiplication),
+        Token::Decimal(BigDecimal::from(100)),
+    ],
+    Operator::Multiplication => Ok(vec![
+        Token::Decimal(BigDecimal::from(20000)),
+    ]))]
+    #[test_case(vec![Token::Decimal(BigDecimal::from(100))],Operator::Plus => Ok(vec![Token::Decimal(BigDecimal::from(100))]))]
+    #[test_case(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Minus),
+        Token::Decimal(BigDecimal::from(100)),
+    ],
+    Operator::Plus => Ok(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Minus),
+        Token::Decimal(BigDecimal::from(100)),
+    ]))]
+    #[test_case(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Plus),
+        Token::Decimal(BigDecimal::from(100)),
+    ],
+    Operator::Plus => Ok(vec![
+        Token::Decimal(BigDecimal::from(300)),
+    ]))]
+    #[test_case(vec![Token::Decimal(BigDecimal::from(100))],Operator::Minus => Ok(vec![Token::Decimal(BigDecimal::from(100))]))]
+    #[test_case(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Plus),
+        Token::Decimal(BigDecimal::from(100)),
+    ],
+    Operator::Minus => Ok(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Plus),
+        Token::Decimal(BigDecimal::from(100)),
+    ]))]
+    #[test_case(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Minus),
+        Token::Decimal(BigDecimal::from(100)),
+    ],
+    Operator::Minus => Ok(vec![
+        Token::Decimal(BigDecimal::from(100)),
+    ]))]
+    #[test_case(vec![Token::Decimal(BigDecimal::from(100))],Operator::Division => Ok(vec![Token::Decimal(BigDecimal::from(100))]))]
+    #[test_case(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Plus),
+        Token::Decimal(BigDecimal::from(100)),
+    ],
+    Operator::Division => Ok(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Plus),
+        Token::Decimal(BigDecimal::from(100)),
+    ]))]
+    #[test_case(vec![
+        Token::Decimal(BigDecimal::from(200)),
+        Token::Operator(Operator::Division),
+        Token::Decimal(BigDecimal::from(100)),
+    ],
+    Operator::Division => Ok(vec![
+        Token::Decimal(BigDecimal::from(2)),
+    ]))]
+    fn operate_tokens_works(tokens: Vec<Token>, op: Operator) -> Result<Vec<Token>> {
+        operate_tokens(tokens, op)
+    }
 }
