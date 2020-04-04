@@ -86,6 +86,7 @@ impl Component for App {
         if apply_display {
             if let Ok(Some(new_display)) = &self.result {
                 self.display = new_display.clone();
+                self.result = Ok(None);
             }
         }
 
@@ -102,13 +103,25 @@ impl Component for App {
                     })>
                         <input type="text" maxlength="20" class="calc__display-input calc__display-input--normal" value={self.display.clone()} oninput=self.link.callback(|e:InputData|Msg::ModifiedDisplay(e.value))/>
                     </form>
+                    {
+                        match &self.result{
+                            Ok(None) => html!{},
+                            Ok(Some(result_display)) => html!{
+                                <p class="calc__display-sub calc__display-sub--normal" >{result_display}</p>
+                            },
+                            Err(err) => html!{
+                                <p class="calc__display-sub calc__display-sub--error" >{err}</p>
+                            },
+                        }
+                    }
                 </div>
-                <div class="calc__buttons--normal calc__buttons--device">
+                <div class="calc__buttons--normal">
                     <div class="pure-g calc__buttons-group--normal">
                         { self.render_button(&ButtonValue::Clear,4)}
                         { self.render_button(&ButtonValue::Division,4)}
                         { self.render_button(&ButtonValue::Multiplication,4)}
-                        <div class="calc__button pure-u-1-4 calc__buttons-unit calc__buttons-unit--normal">
+                        <div class="pure-u-1-4 calc__buttons-unit calc__buttons-unit--normal">
+                            <button class="calc__button calc__button--normal" type="button" >{" "}</button>
                         </div>
                     </div>
                     <div class="pure-g calc__buttons-group--normal">
