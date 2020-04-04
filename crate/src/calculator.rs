@@ -3,11 +3,11 @@ use crate::parser::*;
 use crate::result::Result;
 use bigdecimal::*;
 
-pub fn calculate(input: &str) -> Result<String> {
-    Ok(calculate_tokens(parse(input)?)?.to_string())
+pub fn calculate(input: &str) -> Result<Option<String>> {
+    Ok(calculate_tokens(parse(input)?)?.map(|r| r.to_string()))
 }
 
-fn calculate_tokens(tokens: Vec<Token>) -> Result<BigDecimal> {
+fn calculate_tokens(tokens: Vec<Token>) -> Result<Option<BigDecimal>> {
     let tokens = operate_tokens(tokens, Operator::Division)?;
     let tokens = operate_tokens(tokens, Operator::Multiplication)?;
     let tokens = operate_tokens(tokens, Operator::Plus)?;
@@ -15,10 +15,12 @@ fn calculate_tokens(tokens: Vec<Token>) -> Result<BigDecimal> {
     if tokens.len() == 1 {
         let token = tokens.pop().unwrap();
         if let Token::Decimal(decimal) = token {
-            Ok(decimal)
+            Ok(Some(decimal))
         } else {
             Err(AppError::InvalidExpression)
         }
+    } else if tokens.is_empty() {
+        Ok(None)
     } else {
         Err(AppError::InvalidExpression)
     }
@@ -139,5 +141,19 @@ mod tests {
     ]))]
     fn operate_tokens_works(tokens: Vec<Token>, op: Operator) -> Result<Vec<Token>> {
         operate_tokens(tokens, op)
+    }
+
+    #[test_case("" => Ok(None))]
+    #[test_case("100" => Ok(Some("100".to_string())))]
+    #[test_case("100+ 200" => Ok(Some("300".to_string())))]
+    #[test_case("100+ 200 * 500" => Ok(Some("100100".to_string())))]
+    #[test_case("100+ 3 / 100" => Ok(Some("100.03".to_string())))]
+    #[test_case("abc" => Err(AppError::InvalidChar('a')))]
+    #[test_case("100+++" => Err(AppError::InvalidExpression))]
+    #[test_case("*100" => Err(AppError::InvalidExpression); "first_multipliton_operator_case")]
+    #[test_case("/100" => Err(AppError::InvalidExpression); "first_division_operator_case")]
+    #[test_case("+100" => Ok(Some("100".to_string())); "first_plus_operator_case")]
+    fn calculate_works(input: &str) -> Result<Option<String>> {
+        calculate(input)
     }
 }

@@ -73,7 +73,7 @@ impl Component for App {
                     ButtonValue::Equal => {
                         let result = calculate(&self.display);
                         match result {
-                            Ok(new_display) => self.display = new_display,
+                            Ok(Some(new_display)) => self.display = new_display,
                             _ => panic!("not implemented"),
                         }
                     }
