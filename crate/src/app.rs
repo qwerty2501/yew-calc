@@ -1,13 +1,15 @@
 use crate::calculator::*;
+use crate::result::*;
 use std::fmt;
 use yew::prelude::*;
 
 pub struct App {
     display: String,
+    result: Result<Option<String>>,
     link: ComponentLink<Self>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum ButtonValue {
     Number(u8),
     Plus,
@@ -38,6 +40,7 @@ impl fmt::Display for ButtonValue {
     }
 }
 
+#[derive(PartialEq)]
 pub enum Msg {
     PushButton(ButtonValue),
     ModifiedDisplay(String),
@@ -49,42 +52,44 @@ impl Component for App {
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         App {
             display: String::new(),
+            result: Ok(None),
             link,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        let mut apply_display = false;
         match msg {
-            Msg::PushButton(b) => {
-                match b {
-                    ButtonValue::Number(_)
-                    | ButtonValue::Plus
-                    | ButtonValue::Minus
-                    | ButtonValue::Division
-                    | ButtonValue::Multiplication
-                    | ButtonValue::Dot
-                    | ButtonValue::Percent => self.display.push_str(&b.to_string()),
-                    ButtonValue::Redo => {
-                        self.display.pop();
-                    }
-                    ButtonValue::Clear => {
-                        self.display = String::new();
-                    }
-                    ButtonValue::Equal => {
-                        let result = calculate(&self.display);
-                        match result {
-                            Ok(Some(new_display)) => self.display = new_display,
-                            _ => panic!("not implemented"),
-                        }
-                    }
+            Msg::PushButton(b) => match b {
+                ButtonValue::Number(_)
+                | ButtonValue::Plus
+                | ButtonValue::Minus
+                | ButtonValue::Division
+                | ButtonValue::Multiplication
+                | ButtonValue::Dot
+                | ButtonValue::Percent => {
+                    self.display.push_str(&b.to_string());
                 }
-                true
-            }
+                ButtonValue::Redo => {
+                    self.display.pop();
+                }
+                ButtonValue::Clear => {
+                    self.display = String::new();
+                }
+                ButtonValue::Equal => apply_display = true,
+            },
             Msg::ModifiedDisplay(v) => {
-                self.display = v;
-                true
+                self.display = v.clone();
+            }
+        };
+        self.result = calculate(&self.display);
+        if apply_display {
+            if let Ok(Some(new_display)) = &self.result {
+                self.display = new_display.clone();
             }
         }
+
+        true
     }
 
     fn view(&self) -> Html {
