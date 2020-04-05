@@ -58,7 +58,6 @@ impl Component for App {
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        let mut apply_display = false;
         match msg {
             Msg::PushButton(b) => match b {
                 ButtonValue::Number(_)
@@ -76,20 +75,14 @@ impl Component for App {
                 ButtonValue::Clear => {
                     self.display = String::new();
                 }
-                ButtonValue::Equal => apply_display = true,
+                ButtonValue::Equal => {
+                    self.calculate();
+                }
             },
             Msg::ModifiedDisplay(v) => {
                 self.display = v.clone();
             }
         };
-        self.result = calculate(&self.display);
-        if apply_display {
-            if let Ok(Some(new_display)) = &self.result {
-                self.display = new_display.clone();
-                self.result = Ok(None);
-            }
-        }
-
         true
     }
 
@@ -157,6 +150,18 @@ impl App {
             <div class={format!("{}{} calc__buttons-unit calc__buttons-unit--normal","pure-u-1-", len)}>
                 <button class="calc__button calc__button--normal" type="button"  onclick=self.link.callback(move |_|Msg::PushButton(onclick_value.clone()))>{v}</button>
             </div>
+        }
+    }
+    fn calculate(&mut self) {
+        let result = calculate(&self.display);
+        match result {
+            Ok(Some(new_display)) => {
+                self.display = new_display;
+                self.result = Ok(None);
+            }
+            Ok(None) | Err(_) => {
+                self.result = result;
+            }
         }
     }
 }
