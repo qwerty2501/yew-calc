@@ -1,0 +1,33 @@
+[package]
+name = "yew-calc-crate"
+categories = ["wasm"]
+version = "0.1.0"
+authors = ["qwerty2501 <qwerty2501@live.jp>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+crate-type = ["cdylib","rlib"]
+
+[dependencies]
+yew = { version = "0.14.1" , features = ["web_sys"] }
+wasm-bindgen = "0.2.59"
+wee_alloc = { version="0.4.5", optional=true }
+console_error_panic_hook = { version = "0.1.6",optional = true }
+cfg-if = "0.1.10"
+test-case = "1.0.0"
+bigdecimal = "0.1.0"
+anyhow = "1.0.27"
+thiserror = "1.0.13"
+
+
+[build]
+target="wasm32-unknown-unknown"
+
+[features]
+default = ["console_error_panic_hook","wee_alloc"]
+
+
+[profile.release]
+opt-level = "z"
+lto = true
