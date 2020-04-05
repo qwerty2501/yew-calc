@@ -13,6 +13,18 @@ body {
   flex-direction: column;
   margin-left: auto;
   margin-right: auto;
+  @media screen and (max-device-width: 1023px) {
+    &--device {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  @media screen and (min-device-width: 1024px) {
+    &--device {
+      width: 480px;
+      height: 768px;
+    }
+  }
   &__button {
     @extend .pure-button;
     &--normal {
