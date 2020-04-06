@@ -3703,13 +3703,6 @@ parcel-bundler@^1.12.4:
     v8-compile-cache "^2.0.0"
     ws "^5.1.1"
 
-parcel-plugin-purgecss@^2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/parcel-plugin-purgecss/-/parcel-plugin-purgecss-2.1.3.tgz#b9644b26e1b719bfd537a7f92e512ab165d8b30f"
-  integrity sha512-PijpHRxXZyQmkdRSs2B/fW/Cs2+CDvF5F2wxu+dlLwix+/MQJ+y8rjeQyDNXPWVks++nRrnfMDtKljJpLb7xjg==
-  dependencies:
-    purgecss "^1.3.0"
-
 parcel-plugin-wasm.rs@^1.2.15:
   version "1.2.15"
   resolved "https://registry.yarnpkg.com/parcel-plugin-wasm.rs/-/parcel-plugin-wasm.rs-1.2.15.tgz#2e55c8f1eb699980b49e7f73aaca86266b922e25"
@@ -4291,7 +4284,7 @@ purecss@^1.0.1:
   resolved "https://registry.yarnpkg.com/purecss/-/purecss-1.0.1.tgz#c83d84326a10beb5c3b36d20c0254e946e5568a7"
   integrity sha512-mTUc5ZzpzafswEhCmTDfSRMMyRFdLYdd+KywMwnBC/MuA/Th7jug2z0Xso4WkxvtxoU/BS9aRb7WnBNyuA7YJQ==
 
-purgecss@^1.3.0, purgecss@^1.4.0:
+purgecss@^1.4.0:
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/purgecss/-/purgecss-1.4.2.tgz#67ab50cb4f5c163fcefde56002467c974e577f41"
   integrity sha512-hkOreFTgiyMHMmC2BxzdIw5DuC6kxAbP/gGOGd3MEsF3+5m69rIvUEPaxrnoUtfODTFKe9hcXjGwC6jcjoyhOw==
