@@ -1,4 +1,4 @@
-use crate::calculator::*;
+use crate::evaluator::*;
 use crate::result::*;
 use std::fmt;
 use yew::prelude::*;
@@ -153,7 +153,7 @@ impl App {
         }
     }
     fn calculate(&mut self) {
-        let result = calculate(&self.display);
+        let result = evaluate(&self.display);
         match result {
             Ok(Some(new_display)) => {
                 self.display = new_display;

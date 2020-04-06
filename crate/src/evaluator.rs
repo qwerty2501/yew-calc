@@ -3,11 +3,11 @@ use crate::parser::*;
 use crate::result::Result;
 use bigdecimal::*;
 
-pub fn calculate(input: &str) -> Result<Option<String>> {
-    Ok(calculate_tokens(parse(input)?)?.map(|r| r.to_string()))
+pub fn evaluate(input: &str) -> Result<Option<String>> {
+    Ok(evaluate_tokens(parse(input)?)?.map(|r| r.to_string()))
 }
 
-fn calculate_tokens(tokens: Vec<Token>) -> Result<Option<BigDecimal>> {
+fn evaluate_tokens(tokens: Vec<Token>) -> Result<Option<BigDecimal>> {
     let tokens = operate_tokens(tokens, Operator::Division)?;
     let tokens = operate_tokens(tokens, Operator::Multiplication)?;
     let tokens = operate_tokens(tokens, Operator::Plus)?;
@@ -153,7 +153,7 @@ mod tests {
     #[test_case("*100" => Err(AppError::InvalidExpression); "first_multipliton_operator_case")]
     #[test_case("/100" => Err(AppError::InvalidExpression); "first_division_operator_case")]
     #[test_case("+100" => Ok(Some("100".to_string())); "first_plus_operator_case")]
-    fn calculate_works(input: &str) -> Result<Option<String>> {
-        calculate(input)
+    fn evaluate_works(input: &str) -> Result<Option<String>> {
+        evaluate(input)
     }
 }
