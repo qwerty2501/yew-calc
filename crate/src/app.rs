@@ -51,7 +51,7 @@ impl Component for App {
     type Message = Msg;
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         App {
-            display: String::new(),
+            display: String::default(),
             result: Ok(None),
             link,
         }
@@ -68,12 +68,15 @@ impl Component for App {
                 | ButtonValue::Dot
                 | ButtonValue::Percent => {
                     self.display.push_str(&b.to_string());
+                    self.result = Ok(None);
                 }
                 ButtonValue::Redo => {
                     self.display.pop();
+                    self.result = Ok(None);
                 }
                 ButtonValue::Clear => {
-                    self.display = String::new();
+                    self.display = String::default();
+                    self.result = Ok(None);
                 }
                 ButtonValue::Equal => {
                     self.calculate();
@@ -81,6 +84,7 @@ impl Component for App {
             },
             Msg::ModifiedDisplay(v) => {
                 self.display = v.clone();
+                self.result = Ok(None);
             }
         };
         true
@@ -94,17 +98,19 @@ impl Component for App {
                         e.prevent_default();
                         Msg::PushButton(ButtonValue::Equal)
                     })>
-                        <input type="text" maxlength="20" class="calc__display-input calc__display-input--normal" value={self.display.clone()} oninput=self.link.callback(|e:InputData|Msg::ModifiedDisplay(e.value))/>
+                        <input type="text" maxlength="20" class="calc__display-input calc__display-input--normal"
+                            value=if let Ok(Some(new_display)) = &self.result{
+                                new_display.clone()
+                            } else{
+                                self.display.clone()
+                            } oninput=self.link.callback(|e:InputData|Msg::ModifiedDisplay(e.value))/>
                     </form>
                     {
                         match &self.result{
-                            Ok(None) => html!{},
-                            Ok(Some(result_display)) => html!{
-                                <p class="calc__display-sub calc__display-sub--normal" >{result_display}</p>
-                            },
                             Err(err) => html!{
                                 <p class="calc__display-sub calc__display-sub--error" >{err}</p>
                             },
+                            _ => html!{}
                         }
                     }
                 </div>
@@ -153,15 +159,7 @@ impl App {
         }
     }
     fn calculate(&mut self) {
-        let result = evaluate(&self.display);
-        match result {
-            Ok(Some(new_display)) => {
-                self.display = new_display;
-                self.result = Ok(None);
-            }
-            Ok(None) | Err(_) => {
-                self.result = result;
-            }
-        }
+        self.result = evaluate(&self.display);
+        self.display = String::default();
     }
 }
