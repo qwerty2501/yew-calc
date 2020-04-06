@@ -1,7 +1,7 @@
 #![recursion_limit = "512"]
 mod app;
-mod calculator;
 mod error;
+mod evaluator;
 mod parser;
 mod result;
 #[macro_use]

@@ -4,7 +4,7 @@ use bigdecimal::*;
 use std::str::FromStr;
 
 #[derive(PartialEq, Debug, Clone)]
-pub enum Token {
+pub enum Symbol {
     Decimal(BigDecimal),
     Operator(Operator),
 }
@@ -17,20 +17,20 @@ pub enum Operator {
 }
 
 struct Parser {
-    tokens: Vec<Token>,
+    expression: Vec<Symbol>,
     cache: String,
 }
 
-pub fn parse(input: &str) -> Result<Vec<Token>> {
+pub fn parse(input: &str) -> Result<Vec<Symbol>> {
     let parser = Parser {
-        tokens: vec![],
+        expression: vec![],
         cache: String::new(),
     };
     parser.parse(input)
 }
 
 impl Parser {
-    fn parse(mut self, input: &str) -> Result<Vec<Token>> {
+    fn parse(mut self, input: &str) -> Result<Vec<Symbol>> {
         for c in input.chars() {
             if c >= '0' && c <= '9' || c == '.' {
                 self.cache.push(c);
@@ -40,16 +40,18 @@ impl Parser {
                     '-' => self.on_sigin_operator(c, Operator::Minus)?,
                     '/' => {
                         self.flush()?;
-                        self.tokens.push(Token::Operator(Operator::Division));
+                        self.expression.push(Symbol::Operator(Operator::Division));
                     }
                     '*' | '×' => {
                         self.flush()?;
-                        self.tokens.push(Token::Operator(Operator::Multiplication));
+                        self.expression
+                            .push(Symbol::Operator(Operator::Multiplication));
                     }
                     '%' => {
                         self.flush()?;
-                        let first_token = self.tokens.last_mut().ok_or(AppError::InvalidPercent)?;
-                        if let Token::Decimal(decimal) = first_token {
+                        let first_symbol =
+                            self.expression.last_mut().ok_or(AppError::InvalidPercent)?;
+                        if let Symbol::Decimal(decimal) = first_symbol {
                             *decimal = decimal.clone() / 100;
                         } else {
                             Err(AppError::InvalidPercent)?;
@@ -61,14 +63,14 @@ impl Parser {
             }
         }
         self.flush()?;
-        Ok(self.tokens)
+        Ok(self.expression)
     }
     fn on_sigin_operator(&mut self, c: char, op: Operator) -> Result<()> {
         self.flush()?;
-        if self.tokens.is_empty() {
+        if self.expression.is_empty() {
             self.cache.push(c);
         } else {
-            self.tokens.push(Token::Operator(op));
+            self.expression.push(Symbol::Operator(op));
         }
         Ok(())
     }
@@ -76,10 +78,10 @@ impl Parser {
         if !self.cache.is_empty() {
             let bd = BigDecimal::from_str(&self.cache)
                 .or_else(|_| Err(AppError::InvalidString(self.cache.clone())))?;
-            if let Some(Token::Decimal(_)) = self.tokens.last() {
+            if let Some(Symbol::Decimal(_)) = self.expression.last() {
                 Err(AppError::InvalidExpression)?;
             }
-            self.tokens.push(Token::Decimal(bd));
+            self.expression.push(Symbol::Decimal(bd));
         }
         self.cache.clear();
         Ok(())
@@ -102,21 +104,21 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case("+100",vec![Token::Decimal(BigDecimal::from(100))] => Ok(()))]
-    #[test_case("101",vec![Token::Decimal(BigDecimal::from(101))]=> Ok(()))]
-    #[test_case("-102",vec![Token::Decimal(BigDecimal::from(-102))]=> Ok(()))]
-    #[test_case("102-2000",vec![Token::Decimal(BigDecimal::from(102)),Token::Operator(Operator::Minus),Token::Decimal(BigDecimal::from(2000))]=> Ok(()))]
-    #[test_case("2000*1000",vec![Token::Decimal(BigDecimal::from(2000)),Token::Operator(Operator::Multiplication),Token::Decimal(BigDecimal::from(1000))] => Ok(()))]
-    #[test_case("4000×2000",vec![Token::Decimal(BigDecimal::from(4000)),Token::Operator(Operator::Multiplication),Token::Decimal(BigDecimal::from(2000))] => Ok(()))]
-    #[test_case("4000%",vec![Token::Decimal(BigDecimal::from(40))] => Ok(()))]
-    #[test_case("4000%%",vec![Token::Decimal(BigDecimal::from(0.4))] => Ok(()))]
-    #[test_case("2.143",vec![Token::Decimal(BigDecimal::from(2.143))]=> Ok(()))]
-    #[test_case("-3.343",vec![Token::Decimal(BigDecimal::from(-3.343))]=> Ok(()))]
-    #[test_case("-a3.343",vec![Token::Decimal(BigDecimal::from(-3.343))]=> Err(AppError::InvalidChar('a')))]
+    #[test_case("+100",vec![Symbol::Decimal(BigDecimal::from(100))] => Ok(()))]
+    #[test_case("101",vec![Symbol::Decimal(BigDecimal::from(101))]=> Ok(()))]
+    #[test_case("-102",vec![Symbol::Decimal(BigDecimal::from(-102))]=> Ok(()))]
+    #[test_case("102-2000",vec![Symbol::Decimal(BigDecimal::from(102)),Symbol::Operator(Operator::Minus),Symbol::Decimal(BigDecimal::from(2000))]=> Ok(()))]
+    #[test_case("2000*1000",vec![Symbol::Decimal(BigDecimal::from(2000)),Symbol::Operator(Operator::Multiplication),Symbol::Decimal(BigDecimal::from(1000))] => Ok(()))]
+    #[test_case("4000×2000",vec![Symbol::Decimal(BigDecimal::from(4000)),Symbol::Operator(Operator::Multiplication),Symbol::Decimal(BigDecimal::from(2000))] => Ok(()))]
+    #[test_case("4000%",vec![Symbol::Decimal(BigDecimal::from(40))] => Ok(()))]
+    #[test_case("4000%%",vec![Symbol::Decimal(BigDecimal::from(0.4))] => Ok(()))]
+    #[test_case("2.143",vec![Symbol::Decimal(BigDecimal::from(2.143))]=> Ok(()))]
+    #[test_case("-3.343",vec![Symbol::Decimal(BigDecimal::from(-3.343))]=> Ok(()))]
+    #[test_case("-a3.343",vec![Symbol::Decimal(BigDecimal::from(-3.343))]=> Err(AppError::InvalidChar('a')))]
     #[test_case("4000%20",vec![] => Err(AppError::InvalidExpression))]
     #[test_case("\u{0028}400+20\u{0029}*20",vec![] => Err(AppError::InvalidChar('\u{0028}')))]
-    #[test_case("400 + 23",vec![Token::Decimal(BigDecimal::from(400)),Token::Operator(Operator::Plus),Token::Decimal(BigDecimal::from(23))] => Ok(()))]
-    fn parse_works(input: &str, expected: Vec<Token>) -> Result<()> {
+    #[test_case("400 + 23",vec![Symbol::Decimal(BigDecimal::from(400)),Symbol::Operator(Operator::Plus),Symbol::Decimal(BigDecimal::from(23))] => Ok(()))]
+    fn parse_works(input: &str, expected: Vec<Symbol>) -> Result<()> {
         assert_eq!(expected, parse(input)?);
         Ok(())
     }
