@@ -23,7 +23,3 @@ thiserror = "1.0.13"
 [features]
 default = ["console_error_panic_hook","wee_alloc"]
 
-
-[profile.release]
-opt-level = "z"
-lto = true
